@@ -412,5 +412,5 @@
 */
 
 &tsadc {
-	rockchip,grf = <&sysgrf>;
+	rockchip,grf = <&sys_grf>;
 };
