@@ -241,6 +241,19 @@ config DWC_ETH_QOS_INTEL
 	help
 	  The Synopsys Designware Ethernet QOS IP block with the specific
 	  configuration used in the Intel Elkhart-Lake soc.
+	  Cannot be enabled together with DWC_ETH_QOS_MOTORCOMM.
+
+config DWC_ETH_QOS_MOTORCOMM
+	bool "Synopsys DWC Ethernet QOS device support for Motorcomm YT6801"
+	depends on DWC_ETH_QOS && PCI
+	depends on !DWC_ETH_QOS_INTEL
+	select PHY_MOTORCOMM
+	help
+	  The Synopsys Designware Ethernet QOS IP block with the specific
+	  configuration used in the Motorcomm YT6801 PCI Ethernet controller.
+	  The YT6801 contains a GMAC4 core with an integrated YT8531S PHY
+	  connected via GMII interface.
+	  Cannot be enabled together with DWC_ETH_QOS_INTEL.
 
 config DWC_ETH_QOS_ROCKCHIP
 	bool "Synopsys DWC Ethernet QOS device support for Rockchip SoCs"
