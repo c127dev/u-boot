@@ -229,6 +229,9 @@ struct eqos_config {
 	int config_mac;
 	int config_mac_mdio;
 	unsigned int axi_bus_width;
+	unsigned int override_desc_size;
+	bool has_ch0_control_dsl_override;
+	unsigned int ch0_control_dsl_override;
 	phy_interface_t (*interface)(const struct udevice *dev);
 	struct eqos_ops *ops;
 };

@@ -297,6 +297,9 @@ struct eqos_config eqos_motorcomm_config = {
 	.config_mac = EQOS_MAC_RXQ_CTRL0_RXQ0EN_ENABLED_DCB,
 	.config_mac_mdio = EQOS_MAC_MDIO_ADDRESS_CR_20_35,
 	.axi_bus_width = EQOS_AXI_WIDTH_64,
+	.override_desc_size = 32,
+	.has_ch0_control_dsl_override = true,
+	.ch0_control_dsl_override = 1,
 	.interface = eqos_get_interface_motorcomm,
 	.ops = &eqos_motorcomm_ops,
 };

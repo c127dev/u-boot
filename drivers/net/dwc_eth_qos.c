@@ -938,8 +938,12 @@ static int eqos_start(struct udevice *dev)
 			EQOS_MAX_PACKET_SIZE <<
 			EQOS_DMA_CH0_RX_CONTROL_RBSZ_SHIFT);
 
-	desc_pad = (eqos->desc_size - sizeof(struct eqos_desc)) /
-		   eqos->config->axi_bus_width;
+	if (eqos->config->has_ch0_control_dsl_override) {
+		desc_pad = eqos->config->ch0_control_dsl_override;
+	} else {
+		desc_pad = (eqos->desc_size - sizeof(struct eqos_desc)) /
+			   eqos->config->axi_bus_width;
+	}
 
 	setbits_le32(&eqos->dma_regs->ch0_control,
 		     EQOS_DMA_CH0_CONTROL_PBLX8 |
@@ -1215,19 +1219,23 @@ static int eqos_probe_resources_core(struct udevice *dev)
 
 	debug("%s(dev=%p):\n", __func__, dev);
 
-	/* Maximum distance between neighboring descriptors, in Bytes. */
-	desc_step = sizeof(struct eqos_desc) +
-		    EQOS_DMA_CH0_CONTROL_DSL_MASK * eqos->config->axi_bus_width;
-	if (desc_step < ARCH_DMA_MINALIGN) {
-		/*
-		 * The EQoS hardware implementation cannot place one descriptor
-		 * per cacheline, it is necessary to place multiple descriptors
-		 * per cacheline in memory and do cache management carefully.
-		 */
-		eqos->desc_size = BIT(fls(desc_step) - 1);
+	if (eqos->config->override_desc_size) {
+		eqos->desc_size = eqos->config->override_desc_size;
 	} else {
-		eqos->desc_size = ALIGN(sizeof(struct eqos_desc),
-					(unsigned int)ARCH_DMA_MINALIGN);
+		/* Maximum distance between neighboring descriptors, in Bytes. */
+		desc_step = sizeof(struct eqos_desc) +
+			    EQOS_DMA_CH0_CONTROL_DSL_MASK * eqos->config->axi_bus_width;
+		if (desc_step < ARCH_DMA_MINALIGN) {
+			/*
+			 * The EQoS hardware implementation cannot place one descriptor
+			 * per cacheline, it is necessary to place multiple descriptors
+			 * per cacheline in memory and do cache management carefully.
+			 */
+			eqos->desc_size = BIT(fls(desc_step) - 1);
+		} else {
+			eqos->desc_size = ALIGN(sizeof(struct eqos_desc),
+						(unsigned int)ARCH_DMA_MINALIGN);
+		}
 	}
 	eqos->desc_per_cacheline = ARCH_DMA_MINALIGN / eqos->desc_size;
 
