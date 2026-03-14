@@ -335,6 +335,13 @@ int rockchip_setup_macaddr(void)
 	if (env_get("ethaddr"))
 		return 0;
 
+	/*
+	 * Orange Pi 5 Pro uses a PCIe-attached Motorcomm NIC with its own eFuse MAC.
+	 * Disable auto-generation to allow the ROM MAC to be used.
+	 */
+	if (of_machine_is_compatible("xunlong,orangepi-5-pro"))
+		return 0;
+
 	if (!cpuid) {
 		debug("%s: could not retrieve 'cpuid#'\n", __func__);
 		return -1;
